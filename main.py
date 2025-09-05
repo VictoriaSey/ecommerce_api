@@ -40,6 +40,7 @@ class ProductModel(BaseModel):
     description: str
     price: float
 
+# Home route
 
 @app.get("/")
 def get_home():
@@ -78,6 +79,19 @@ def get_product_by_id(product_id):
         raise HTTPException(status_code=404, detail="Product not found")
     return {"data": replace_mongo_id(product)}
 
+@app.patch("/products/{product_id}")
+def update_product(product_id: str, product_data: ProductModel):
+    # Update product in database by id 
+    get_product_by_id(product_id)
+    updates_dict = product_data.model_dump()
+    return{"message": "Product updated successfully", "data": updates_dict  }
+
+@app.delete("/products/{product_id}")
+def delete_product_by_id(product_id: str):
+    # Delete product from database by id
+    get_product_by_id(product_id)
+    products_collection.delete_one({"_id": ObjectId(product_id)})
+    return {"message": "Product deleted successfully"}
 
 #  User authentication routes
 @app.post("/register")
